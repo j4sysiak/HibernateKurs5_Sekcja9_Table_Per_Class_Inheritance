@@ -12,7 +12,7 @@ import pl.jaceksysiak.demo.entity.Investment;
 import pl.jaceksysiak.demo.entity.Portfolio;
 import pl.jaceksysiak.demo.entity.Stock;
 
-public class Application_CreateData {
+public class Application_RetriveData {
 
 	public static void main(String[] args) {
 
@@ -32,32 +32,60 @@ public class Application_CreateData {
 			// start a transaction
 			session.beginTransaction();
 			
-			//Creating the Object 
-			Portfolio portfolio= new Portfolio();
-			portfolio.setName("First Investments");
+			Long tmpId=1L;
+			Portfolio dbPortfolio = (Portfolio) session.get(Portfolio.class, tmpId);
+			session.refresh(dbPortfolio);
 			
-		    Stock stock = createStock();		
-		    stock.setPortfolio(portfolio);
-		    
-		    Bond bond = createBond();
-		    bond.setPortfolio(portfolio);
-		
-			portfolio.getInvestements().add(stock);
-			portfolio.getInvestements().add(bond);
-			
-			//Saving the Object to DB	
-			session.save(stock);
-			session.save(bond);
+			for(Investment i : dbPortfolio.getInvestements()){
+				System.out.println(i.getName());
+			}
 			
 			
 			
+//        taki sql bêdzie:			
+//			Hibernate: select investemen0_.PORTFOLIO_ID as PORTFOLI5_1_0_, 
+//			investemen0_.INVESTMENT_ID as INVESTME1_1_0_, 
+//			investemen0_.INVESTMENT_ID as INVESTME1_1_1_, 
+//			investemen0_.ISSUER as ISSUER2_1_1_, 
+//			investemen0_.NAME as NAME3_1_1_, 
+//			investemen0_.PORTFOLIO_ID as PORTFOLI5_1_1_, 
+//			investemen0_.PURCHASE_DATE as PURCHASE4_1_1_, 
+//			investemen0_.QUANTITY as QUANTITY1_3_1_, 
+//			investemen0_.SHARE_PRICE as SHARE_PR2_3_1_, 
+//			investemen0_.INTEREST_RATE as INTEREST1_0_1_, 
+//			investemen0_.MATURITY_DATE as MATURITY2_0_1_, 
+//			investemen0_.VALUE as VALUE3_0_1_, 
+//			investemen0_.clazz_ as clazz_1_ 
+//			from (
 //
-//			Portfolio dbPortfolio = (Portfolio) session.get(Portfolio.class, portfolio.getPortfolioId());
-//			session.refresh(dbPortfolio);
-//			
-//			for(Investment i:dbPortfolio.getInvestements()){
-//				System.out.println(i.getName());
-//			}
+//			 select 
+//			 INVESTMENT_ID, 
+//			 ISSUER, 
+//			 NAME, 
+//			 PURCHASE_DATE, 
+//			 PORTFOLIO_ID, 
+//			 QUANTITY, 
+//			 SHARE_PRICE, 
+//			 null as INTEREST_RATE, 
+//			 null as MATURITY_DATE, 
+//			 null as VALUE, 
+//			 1 as clazz_ 
+//			 from STOCK 
+//			 union 
+//			 select 
+//			 INVESTMENT_ID, 
+//			 ISSUER, NAME, 
+//			 PURCHASE_DATE, 
+//			 PORTFOLIO_ID, 
+//			 null as QUANTITY, 
+//			 null as SHARE_PRICE, 
+//			 INTEREST_RATE, 
+//			 MATURITY_DATE, 
+//			 VALUE, 2 as clazz_ from BOND 
+//			 
+//			 ) investemen0_ 
+//			 where investemen0_.PORTFOLIO_ID=?
+//					 
 			
 			// commit transaction
 			session.getTransaction().commit();
